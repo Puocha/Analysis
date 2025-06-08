@@ -8,11 +8,31 @@ export function updateMarketData(market, data) {
         marketDataStore[market] = [];
         // Removed dynamic dropdown population as it's now hardcoded in index.html
     }
-    marketDataStore[market].push(data);
+    
+    // Add timestamp to the data
+    const dataWithTimestamp = {
+        ...data,
+        timestamp: new Date().getTime()
+    };
+    
+    marketDataStore[market].push(dataWithTimestamp);
     console.log(`Data for ${market} updated. Total entries: ${marketDataStore[market].length}`);
-    // This function needs to be called from wherever your market data table is populated.
-    // The 'data' object should contain price, last digit, and percentage distribution.
-    // Example: { price: '1.2345', lastDigit: '7', percentages: ['10%', '5%', ...] }
+    
+    // Clean up old records
+    cleanupOldRecords(market);
+}
+
+// Function to clean up records older than 1 hour and 30 minutes
+function cleanupOldRecords(market) {
+    if (!marketDataStore[market]) return;
+    
+    const currentTime = new Date().getTime();
+    const oneHourThirtyMinutes = 90 * 60 * 1000; // 90 minutes in milliseconds
+    
+    // Filter out records older than 1 hour and 30 minutes
+    marketDataStore[market] = marketDataStore[market].filter(record => {
+        return (currentTime - record.timestamp) <= oneHourThirtyMinutes;
+    });
 }
 
 // Function to generate CSV content
@@ -22,11 +42,10 @@ function generateCsv(data) {
     }
 
     // Assuming data entries have the same structure
-    const headers = ['Price', 'Last Digit', '0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%']; // Example headers
+    const headers = ['Timestamp', 'Price', 'Last Digit', '0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%'];
     const rows = data.map(entry => {
-        // Map your data object structure to CSV columns
-        // This is an example and needs to match the structure passed to updateMarketData
-        const values = [entry.price, entry.lastDigit, ...entry.percentages];
+        const timestamp = new Date(entry.timestamp).toLocaleString();
+        const values = [timestamp, entry.price, entry.lastDigit, ...entry.percentages];
         return values.join(',');
     });
 
