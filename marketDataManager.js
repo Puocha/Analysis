@@ -6,7 +6,6 @@ export function updateMarketData(market, data) {
     console.log(`updateMarketData received data for market: ${market}`, data);
     if (!marketDataStore[market]) {
         marketDataStore[market] = [];
-        // Removed dynamic dropdown population as it's now hardcoded in index.html
     }
     
     // Add timestamp to the data
@@ -98,8 +97,4 @@ document.getElementById('download-data-button').addEventListener('click', () => 
     const csvContent = generateCsv(dataToDownload);
     const filename = `${selectedMarket}_market_data.csv`;
     downloadCsv(filename, csvContent);
-});
-
-// Note: You need to call the updateMarketData function from your existing logic
-// that populates the market data table. Pass the market name and the data object.
-// Example call: updateMarketData('Volatility 100 Index', { price: '...', lastDigit: '...', percentages: [...] }); 
+}); 
