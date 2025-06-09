@@ -41,11 +41,19 @@ function generateCsv(data) {
         return '';
     }
 
-    // Assuming data entries have the same structure
+    // Define headers with proper spacing
     const headers = ['Timestamp', 'Price', 'Last Digit', '0%', '1%', '2%', '3%', '4%', '5%', '6%', '7%', '8%', '9%'];
     const rows = data.map(entry => {
-        const timestamp = new Date(entry.timestamp).toLocaleString();
-        const values = [timestamp, entry.price, entry.lastDigit, ...entry.percentages];
+        // Format timestamp to ensure proper separation
+        const date = new Date(entry.timestamp);
+        const timestamp = `${date.toLocaleDateString()},${date.toLocaleTimeString()}`;
+        // Ensure all values are properly quoted to handle any special characters
+        const values = [
+            `"${timestamp}"`,
+            entry.price,
+            entry.lastDigit,
+            ...entry.percentages.map(p => p.toString())
+        ];
         return values.join(',');
     });
 
